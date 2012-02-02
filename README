@@ -1,2 +1,4 @@
 A simple ruby script for searching your directories that is much faster than
 grep.
+
+Doesn't work everywhere yet.
