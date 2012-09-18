@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby19
 
 # Craig Hammell
 # find.rb
@@ -12,27 +11,27 @@ require 'fileutils'
 $interrupted = false
 Version = "0.0.1"
 Opts = {
-	'exclude'	=> nil,
-	'include'	=> nil
+	'exclude'  => nil,
+	'include'  => nil
 }
 Stats = {
-	"content_matches"	=> 0,
-	"name_matches"		=> 0,
-	"files_grepped"		=> 0,
-	"nodes_skipped"		=> 0,
-	"not_utf8"			=> 0,
-	"start"				=> 0
+	"content_matches"  => 0,
+	"name_matches"     => 0,
+	"files_grepped"    => 0,
+	"nodes_skipped"    => 0,
+	"not_utf8"         => 0,
+	"start"            => 0
 }
 Colors = {
-	"white"		=> 1,
-	"black"		=> 30,
-	"red"		=> 91,
-	"green"		=> 32,
-	"yellow"	=> 33,
-	"blue"		=> 34,
-	"magenta"	=> 35,
-	"cyan"		=> 36,
-	"white_bg"	=> 47
+	"white"     => 1,
+	"black"     => 30,
+	"red"       => 91,
+	"green"     => 32,
+	"yellow"    => 33,
+	"blue"      => 34,
+	"magenta"   => 35,
+	"cyan"      => 36,
+	"white_bg"  => 47
 }
 
 # Handle ctrl-c
@@ -42,7 +41,7 @@ end
 
 # Ctrl-c output
 def terminate
-	puts colorize "\nTERMINATED", 'red'
+	puts colorize("\nTERMINATED", 'red')
 	print_summary
 	exit
 end
@@ -52,14 +51,14 @@ def parse_opts
 	if ARGV.empty? then puts "Usage: ch_find.rb [options] <search_term> <replacement>\n"; exit end
 	OptionParser.new do |opts|
 		opts.banner = "\nOptions:"
-		opts.on("-v", "--version", "Display the version")							{output_version}
-		opts.on("-h", "--help", "Display the help")									{output_help opts}
-		opts.on("-n", "--names", "Grep file names only, not contents")				{Opts['names'] = true}
-		opts.on("-f", "--file [FILE]", "Act only on a specific file")				{|file| Opts['file'] = file}
-		opts.on("-e", "--exclude [EXTENSIONS]", "Exclude specific files types")		{|extensions| Opts['exclude'] = extensions.gsub('.','').gsub(',',' ').split(/\s/)}
-		opts.on("-i", "--include [EXTENSIONS]", "Include specific file types only")	{|extensions| Opts['include'] = extensions.gsub('.','').gsub(',',' ').split(/\s/)}
-		opts.on("-r", "--replace", "Replace param1 with param2")					{Opts['replace'] = true}
-		opts.on("-d", "--dry-run", "Print replacements but do not write to disk")	{Opts['dry_run'] = true}
+		opts.on("-v", "--version", "Display the version")                            {output_version}
+		opts.on("-h", "--help", "Display the help")                                  {output_help opts}
+		opts.on("-n", "--names", "Grep file names only, not contents")               {Opts['names'] = true}
+		opts.on("-f", "--file [FILE]", "Act only on a specific file")                {|file| Opts['file'] = file}
+		opts.on("-e", "--exclude [EXTENSIONS]", "Exclude specific files types")      {|extensions| Opts['exclude'] = extensions.gsub('.','').gsub(',',' ').split(/\s/)}
+		opts.on("-i", "--include [EXTENSIONS]", "Include specific file types only")  {|extensions| Opts['include'] = extensions.gsub('.','').gsub(',',' ').split(/\s/)}
+		opts.on("-r", "--replace", "Replace param1 with param2")                     {Opts['replace'] = true}
+		opts.on("-d", "--dry-run", "Print replacements but do not write to disk")    {Opts['dry_run'] = true}
 	end.parse!
 end
 
@@ -142,15 +141,15 @@ end
 
 # Traverse a directory.  For directories, call explore.  For files, grep them.  Skip other node types.
 def explore(dir)
-    terminate if $interrupted
-    Dir.new(dir).each do |node|
+	terminate if $interrupted
+	Dir.new(dir).each do |node|
 		node_path = dir + '/' + node
-		if File.directory?(node_path) && !File.symlink?(node_path) && node[0] != '.'
+		if File.directory?(node_path) && !File.symlink?(node_path) && node[0,1] != '.'
 			explore node_path
-	    elsif File.file?(node_path) && node[0] != '.'
+		elsif File.file?(node_path) && node[0] != '.'
 			if greppable node_path
 				if node =~ /#{ARGV[0]}/
-					puts colorize node_path, 'yellow'
+					puts colorize(node_path, 'yellow')
 					Stats['name_matches'] += 1
 				end
 				grep_file node_path unless Opts['names']
@@ -160,8 +159,8 @@ def explore(dir)
 			end
 		else
 			Stats['nodes_skipped'] += 1
-    	end
-    end
+		end
+	end
 end
 
 def main
