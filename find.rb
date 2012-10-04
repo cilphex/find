@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 
 # Craig Hammell
 # find.rb
@@ -112,11 +113,12 @@ end
 # Grep a file
 def grep_file(node_path)
 	begin
-		contents = File.read(node_path, :encoding => "UTF-8")
+		contents = File.read(node_path) #, :encoding => "UTF-8")
 		grepped = contents.gsub /#{ARGV[0]}/im do |match|
-			prefix, suffix, line, inner = $`.split("\n").last.to_s.lstrip, $'.split("\n").first.to_s.rstrip, $`.count("\n")+1, $1
+			before, after = $`, $'
+			prefix, suffix, line, inner = before.split("\n").last.to_s.lstrip, after.split("\n").first.to_s.rstrip, before.count("\n")+1, $1
 			replacement = ARGV[1] ? ARGV[1].gsub('%match', match.to_s).gsub('%inner', inner.to_s) : match
-			print "#{node_path}:#{line}: #{prefix}#{colorize(match, 'cyan')}#{suffix}"
+			print "#{colorize(node_path+':'+line.to_s, 'yellow')}: #{prefix}#{colorize(match, 'cyan')}#{suffix}"
 			if Opts['replace'] or Opts['dry_run'] then
 				puts "\n#{node_path}:#{line}: #{prefix}#{colorize(replacement, 'magenta')}#{suffix}\n"
 			end
